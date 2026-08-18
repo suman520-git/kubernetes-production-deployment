@@ -1,0 +1,11 @@
+kubenet
+
+__pycache__
+*.pyc
+.git
+.venv
+venv
+k8s
+scripts
+README.md
+kubenet

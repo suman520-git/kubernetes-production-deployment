@@ -1,0 +1,176 @@
+
+# to run app
+run   uvicorn app.main:app --reload
+
+
+# Build the Docker image
+
+run   docker build -t k8s-production-backend:1.0.0 .
+
+# Run the image
+
+  docker run -d --name k8s-backend -p 8000:8000 k8s-production-backend:1.0.0
+
+
+# to cretae namespace
+
+ kubectl apply -f k8s/00-namespace.yaml
+
+
+# to check
+  kubectl get namespaces
+
+
+# to apply config map
+    kubectl apply -f k8s/01-configmap.yaml
+
+
+# Check:
+  kubectl get configmap -n k8s-demo
+
+# inspect it:
+
+  kubectl describe configmap backend-config -n k8s-demo
+
+
+#   kubectl apply -f k8s/02-secret.yaml
+
+
+kubectl get secrets -n k8s-demo
+
+
+kubectl get secret backend-secret -n k8s-demo -o yaml
+
+
+# PersistentVolumeClaim
+
+kubectl apply -f k8s/03-pvc.yaml
+
+kubectl get pvc -n k8s-demo
+
+
+kubectl describe pvc backend-pvc -n k8s-demo
+
+
+# deployment
+kubectl apply -f k8s/04-deployment.yaml
+
+kubectl get deployment -n k8s-demo
+
+kubectl get pods -n k8s-demo
+
+
+port forwarding for access pods from local computer
+
+kubectl port-forward pod/backend-5595899b48-bg2sg 9000:8000 -n k8s-demo
+
+
+
+service
+
+
+kubectl apply -f k8s/05-service.yaml
+
+kubectl get service -n k8s-demo
+
+# Check whether the Service found your Pods
+
+  kubectl get endpoints backend-service -n k8s-demo
+
+
+
+kubectl port-forward service/backend-service 8000:80 -n k8s-demo
+
+
+ingress
+
+
+kubectl apply -f k8s/06-ingress.yaml
+
+kubectl get ingress -n k8s-demo
+
+to run app
+
+http://backend.local/docs
+
+
+
+hpa
+
+
+kubectl apply -f k8s/07-hpa.yaml
+
+kubectl get hpa -n k8s-demo
+
+kubectl top pods -n k8s-demo
+
+
+# networkpolicy
+kubectl apply -f k8s/08-networkpolicy.yaml
+
+kubectl get networkpolicy -n k8s-demo
+
+
+# apply everything at once
+
+kubectl apply -f k8s/
+
+
+
+###################################3
+
+kubectl get pods -n k8s-demo
+
+kubectl get service -n k8s-demo
+
+kubectl get pods -n k8s-demo -o wide
+
+
+kubectl get endpoints -n k8s-demo
+
+
+#scaling
+
+kubectl scale deployment backend --replicas=5 -n k8s-demo
+
+
+kubectl scale deployment backend --replicas=3 -n k8s-demo
+
+
+
+### Rolling Update
+
+kubectl rollout history deployment/backend -n k8s-demo
+
+docker build -t k8s-production-backend:2.0.0 .
+
+
+set 
+   kubectl set image deployment/backend backend=k8s-production-backend:2.0.0 -n k8s-demo
+
+
+   kubectl rollout status deployment/backend -n k8s-demo
+
+
+# can see the roll out status while changing the status
+
+
+   kubectl get pods -n k8s-demo -w
+
+# rollback
+
+
+kubectl rollout undo deployment/backend -n k8s-demo
+
+
+kubectl rollout status deployment/backend -n k8s-demo
+
+
+kubectl get pods -n k8s-demo
+
+
+
+Delete the entire application:
+
+```powershell
+kubectl delete namespace k8s-demo
